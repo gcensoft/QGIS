@@ -3400,17 +3400,8 @@ void QgsAttributeForm::reloadIcon( const QString &file, const QString &tooltip, 
   sw->show();
 }
 
-QgsFeature QgsAttributeForm::createFeature( QgsVectorLayer *layer, const QgsGeometry &geometry, const QgsAttributeMap &attributes, QgsExpressionContext *context )
+QgsFeature QgsAttributeForm::createFeature( QgsVectorLayer *layer, const QgsGeometry &geometry, const QgsAttributeMap &attributes, QgsExpressionContext &context )
 {
-  QgsExpressionContext *evalContext = context;
-  std::unique_ptr< QgsExpressionContext > tempContext;
-  if ( !evalContext )
-  {
-    // no context passed, so we create a default one
-    tempContext.reset( new QgsExpressionContext( QgsExpressionContextUtils::globalProjectLayerScopes( layer ) ) );
-    evalContext = tempContext.get();
-  }
-
   const bool reuseAllLastValues = QgsSettingsRegistryCore::settingsDigitizingReuseLastValues->value();
   QgsDebugMsgLevel( QStringLiteral( "reuseAllLastValues: %1" ).arg( reuseAllLastValues ), 2 );
 
@@ -3433,5 +3424,5 @@ QgsFeature QgsAttributeForm::createFeature( QgsVectorLayer *layer, const QgsGeom
     }
   }
 
-  return QgsVectorLayerUtils::createFeature( layer, geometry, initialAttributeValues, evalContext );
+  return QgsVectorLayerUtils::createFeature( layer, geometry, initialAttributeValues, &context );
 }
